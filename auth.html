@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1bfZ0haGuMo0iimcRyMeBFcOwRQdEyTD5Jq1ZQEmgWikaMRyrphKeLLpKJdLt_ySDY9o&usqp=CAU');
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .box {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        input[type=text],
+        input[type=password] {
+            font-family: sans-serif;
+            width: 80%;
+            padding: 20px;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #E0E0E0;
+        }
+        
+        .row {
+            display: flex;
+            align-items: center;
+        }
+        
+        .row label {
+            margin-right: 10px;
+            color: white;
+        }
+        
+        .butt {
+            width: 100%;
+            padding: 15px;
+            border-radius: 4px;
+            border: none;
+            background-color: #A7ECEE;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .butt:hover {
+            background-color: #83e5e8;
+            cursor: pointer;
+        }
+    
+        #secretContent {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left:700px;
+            transform: translate(0,-900%);
+        }
+
+        #signOutButton {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: #A7ECEE;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box" id="authForm">
+                <h1 ><center>Welcome!</center></h1>
+                <input type="text" size="20" maxlength="20" id="userEmail" placeholder="Email">
+                <br>
+                <input type="password" size="20" maxlength="20" id="userPassword" placeholder="Password">
+                <br>
+                <button type="submit" class="butt" id="signUpButton">Sign Up</button>
+                <button type="submit" class="butt" id="signInButton">Sign-In</button>
+
+        </div>
+    </div>
+
+    <div id="secretContent">
+        <button  id="signOutButton" style="color:black">Sign Out</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";        
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+       
+      
+        const firebaseConfig = {
+        apiKey: "AIzaSyDGOLaI8HJCpEHLZBF0k003yVorhLlf054",
+        authDomain: "authfun-84041.firebaseapp.com",
+        projectId: "authfun-84041",
+        storageBucket: "authfun-84041.appspot.com",
+        messagingSenderId: "167597482761",
+        appId: "1:167597482761:web:a46fd6a36c83b2ea9d69d8",
+        measurementId: "G-B8MZ9MHZKK"
+        };
+        
+        const redirectTo = (url) => {
+        window.location.href = url;
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const userEmail = document.querySelector("#userEmail");
+        const userPassword = document.querySelector("#userPassword");
+        const authForm = document.querySelector("#authForm");
+        const secretContent = document.querySelector("#secretContent");
+        const signUpButton = document.querySelector("#signUpButton");
+        const signInButton = document.querySelector("#signInButton");
+        const signOutButton = document.querySelector("#signOutButton");
+
+        secretContent.style.display = 'none';
+
+        const userSignUp = async () => {
+  const signUpEmail = userEmail.value;
+  const signUpPassword = userPassword.value;
+  createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log(user);
+      alert("Your account has been created!");
+      redirectTo("firstpage.html"); // Replace "signup-success.html" with your desired HTML file
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode + errorMessage);
+    });
+};
+
+
+const userSignIn = async () => {
+  const signInEmail = userEmail.value;
+  const signInPassword = userPassword.value;
+  signInWithEmailAndPassword(auth, signInEmail, signInPassword)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      alert("You have signed in successfully!");
+      redirectTo("firstpage.html"); // Replace "signin-success.html" with your desired HTML file
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode + errorMessage);
+    });
+};
+
+        const checkAuthState = async() => {
+            onAuthStateChanged(auth, user => {
+                if(user) {
+                    authForm.style.display = 'none';
+                    secretContent.style.display = 'block';
+                }
+                else {
+                    authForm.style.display = 'block';
+                    secretContent.style.display = 'none';
+                }
+            })
+        }
+
+        const userSignOut = async() => {
+            await signOut(auth);
+        }
+
+        checkAuthState();
+
+        signUpButton.addEventListener('click', (event) => {
+  event.preventDefault(); // Prevent form submission
+  userSignUp();});
+
+        signInButton.addEventListener('click', userSignIn);
+        signOutButton.addEventListener('click', userSignOut);
+      </script>
+</body>
+</html>
